@@ -1,2 +1,3 @@
-public class hi {
+public class hi
+//hi{
 }
