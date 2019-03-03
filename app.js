@@ -1,15 +1,14 @@
-var MongoClient = require('mongodb').MongoClient;
+// Initialize Database
 
+var mongojs = require("mongojs");
 var uri = "mongodb://Artur:%40Amber120@cse116game-shard-00-00-9ogxf.mongodb.net:27017,cse116game-shard-00-01-9ogxf.mongodb.net:27017,cse116game-shard-00-02-9ogxf.mongodb.net:27017/myGame?ssl=true&replicaSet=CSE116Game-shard-0&authSource=admin&retryWrites=true";
-MongoClient.connect(uri, function(err, client) {
-   const collection = client.db("myGame").collection("account");
-   collection.insert({username:"b", password:"bb"});
-   client.close();
-});
+var db = mongojs(uri, ['account', 'progress']);
 
+// Initialize Express for Files
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
+
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -19,8 +18,10 @@ app.use('/client',express.static(__dirname + 'client'));
 serv.listen(2000);
 console.log('Server started.');
 
+
 var SOCKET_LIST = {};
 
+// Parent Class
 var Entity = function() {
 	var self = {
 		x:250,
@@ -42,6 +43,7 @@ var Entity = function() {
 	return self;
 }
 
+// Extends parent Entity
 var Player = function(id){
 	var self = Entity();
 	self.id = id;
@@ -53,6 +55,9 @@ var Player = function(id){
 	self.pressingAttack = false;
 	self.mouseAngle = 0;
 	self.maxSpeed = 10;
+	self.hp = 10;
+	self.hpMax = 10;
+	self.score = 0;
 
 	var super_update = self.update;
 	self.update = function() {
@@ -73,24 +78,50 @@ var Player = function(id){
 
 	self.updateSpeed = function() {
 		if(self.pressingRight){
-			self.speedX += self.maxSpeed;
+			self.speedX = self.maxSpeed;
 		} else if(self.pressingLeft){
-			self.speedX -= self.maxSpeed;
+			self.speedX = -self.maxSpeed;
 		} else {
 			self.speedX = 0;
 		}
 		if(self.pressingUp){
-			self.speedY -= self.maxSpeed;
+			self.speedY = -self.maxSpeed;
 		} else if(self.pressingDown){
-			self.speedY += self.maxSpeed;
+			self.speedY = self.maxSpeed;
 		} else {
 			self.speedY = 0;
 		}
 	}
+	self.getInitPackage = function() {
+		return {
+		id:self.id,
+		x:self.x,
+		y:self.y,
+		number:self.number,
+		hp:self.hp,
+		hpMax:self.hpMax,
+		score:self.score,
+		};
+	}
+
+	self.getUpdatePackage = function() {
+		return {
+		id:self.id,
+		x:self.x,
+		y:self.y,
+		hp:self.hp,
+		score:self.score,
+		};
+	}
+
 	Player.list[id] = self;
+	initPackage.player.push(self.getInitPackage());
 	return self;
 }
+
 Player.list = {};
+
+
 Player.onConnect  = function(socket){
 	var player = Player(socket.id);
 	socket.on('keyPress', function(data){
@@ -107,11 +138,26 @@ Player.onConnect  = function(socket){
 		} else if (data.inputId === 'mouseAngle') {
 			player.mouseAngle = data.state;
 		}
-	})
+	});
+	
+	socket.emit('init',{
+		player:Player.getAllInitPack(),
+		bullet:Bullet.getAllInitPack(),
+	});
+}
+
+Player.getAllInitPack = function() {
+	var players = [];
+	for(var i in Player.list){
+			players.push(Player.list[i].getInitPackage());
+	}
+	return players;
 }
 
 Player.onDisconnect = function(socket) {
 	delete Player.list[socket.id];
+	removePackage.player.push(socket.id);
+
 }
 
 Player.update = function() {
@@ -119,15 +165,12 @@ Player.update = function() {
 	for(var i in Player.list){
 		var player = Player.list[i];
 		player.update();
-		package.push({
-			x:player.x,
-			y:player.y,
-			number:player.number
-		});
+		package.push(player.getUpdatePackage());
 	}
 	return package;
 }
 
+// Extends parent Entity
 var Bullet = function(parent, angle) {
 	var self = Entity();
 	self.id = Math.random();
@@ -146,12 +189,39 @@ var Bullet = function(parent, angle) {
 		for(var i in Player.list){
 			var p = Player.list[i];
 			if(self.getDistance(p) < 32 && self.parent !== p.id){
-				//handle collision. ex: hp--;
+				p.hp -= 1;
+				if(p.hp <= 0){
+					var shooter = Player.list[self.parent];
+					if(shooter){
+						shooter.score += 1;
+					}
+					p.hp = p.hpMax;
+					p.x = Math.random() * 500;
+					p.y = Math.random() * 500;
+				}
 				self.toRemove = true;
 			}
 		}
 	}
+
+	self.getInitPackage = function() {
+		return {
+		id:self.id,
+		x:self.x,
+		y:self.y,
+		};
+	}
+
+	self.getUpdatePackage = function() {
+		return {
+		id:self.id,
+		x:self.x,
+		y:self.y,
+		};
+	}
+
 	Bullet.list[self.id] = self;
+	initPackage.bullet.push(self.getInitPackage());
 	return self;
 }
 Bullet.list = {};
@@ -163,42 +233,52 @@ Bullet.update = function() {
 		bullet.update();
 		if(bullet.toRemove){
 			delete Bullet.list[i];
+			removePackage.bullet.push(bullet.id);
 		} else {
-			package.push({
-				x:bullet.x,
-				y:bullet.y,
-			})
+			package.push(bullet.getUpdatePackage());
 		}
 	}
 	return package;
 }
 
-var DEBUG = true;
-
-var USERS = {
-	//username:password
-	"bob":"asd",
+Bullet.getAllInitPack = function() {
+	var bullets = [];
+	for(var i in Bullet.list){
+		bullets.push(Bullet.list[i].getInitPackage());
+	}
+	return bullets;
 }
 
+var DEBUG = true;
+
 var isValidPassword = function(data, cb) {
-	setTimeout(function(){
-		cb(USERS[data.username] === data.password);
-	},10);
+	db.account.find({username:data.username,password:data.password}, function(err, res){
+		if(res.length > 0){
+			cb(true);
+		} else {
+			cb(false);
+		}
+	});
 }
 
 var isUsernameTaken = function(data, cb) {
-	setTimeout(function(){
-		cb(USERS[data.username]);
-
-	},10);
+	db.account.find({username:data.username}, function(err, res){
+		if(res.length > 0){
+			cb(true);
+		} else {
+			cb(false);
+		}
+	});
 }
 
 var addUser = function(data, cb) {
-	setTimeout(function(){
-		USERS[data.username] = data.password;
+	db.account.insert({username:data.username,password:data.password}, function(err){
 		cb();
-	},10);
+	});
 }
+
+
+// Initialize Web Sockets
 
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
@@ -250,6 +330,11 @@ io.sockets.on('connection', function(socket){
 	});
 });
 
+
+var initPackage = {player:[],bullet:[]};
+var removePackage = {player:[],bullet:[]};
+
+
 setInterval(function(){
 	var package = {
 		player:Player.update(),
@@ -258,8 +343,15 @@ setInterval(function(){
 
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
-		socket.emit('newPositions', package);
+		socket.emit('init', initPackage);
+		socket.emit('update', package);
+		socket.emit('remove', removePackage);
 	}
+
+	initPackage.player = [];
+	initPackage.bullet = [];
+	removePackage.player = [];
+	removePackage.bullet = [];
 
 
 },1000/25);

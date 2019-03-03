@@ -52,23 +52,11 @@
 		}
 	});
 
-	// Game Related
+	// Chat Related
 
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');
-	var ctx = document.getElementById("ctx").getContext("2d");
-	ctx.font = '30px Arial';
-	
-	socket.on('newPositions', function(data){
-		ctx.clearRect(0,0,500,500);
-		for (var i = 0; i < data.player.length; i++) {
-			ctx.fillText(data.player[i].number, data.player[i].x, data.player[i].y);
-		}
-		for (var i = 0; i < data.bullet.length; i++) {
-			ctx.fillRect(data.bullet[i].x-5, data.bullet[i].y-5,10,10);
-		}
-	});
 
 	socket.on('addToChat', function(data){
 		chatText.innerHTML += '<div>' + data + '</div>';
@@ -87,6 +75,118 @@
 		}
 		chatInput.value = '';
 	}
+
+	// Game Related
+
+	var ctx = document.getElementById("ctx").getContext("2d");
+	ctx.font = '30px Arial';
+
+		// init
+
+		var Player = function(initPackage) {
+			var self = {};
+			self.id = initPackage.id;
+			self.number = initPackage.number;
+			self.x = initPackage.x;
+			self.y = initPackage.y;
+			self.hp = initPackage.hp;
+			self.hpMax = initPackage.hpMax;
+			self.score = initPackage.score;
+
+			self.draw = function() {
+				var hpWidth = 30 * self.hp / self.hpMax;
+				ctx.fillRect(self.x - hpWidth/2, self.y - 40, hpWidth, 4);
+				ctx.fillText(self.number, self.x, self.y);
+				ctx.fillText(self.score, self.x, self.y-60);
+			}
+
+			Player.list[self.id] = self;
+			return self;
+		}
+		Player.list = {};
+
+		var Bullet = function(initPackage) {
+			var self = {};
+			self.id = initPackage.id;
+			self.number = initPackage.number;
+			self.x = initPackage.x;
+			self.y = initPackage.y;
+
+			self.draw = function() {
+				ctx.fillRect(self.x-5, self.y-5,10,10);
+			}
+
+			Bullet.list[self.id] = self;
+			return self;
+		}
+		Bullet.list = {};
+
+		socket.on('init',function(data){
+			for(var i = 0; i < data.player.length;i++){
+				new Player(data.player[i]);
+			}
+			for(var i = 0; i < data.bullet.length;i++){
+				new Bullet(data.bullet[i]);
+			}
+		});
+
+		// update
+
+		socket.on('update', function(data){
+			for(var i = 0; i < data.player.length; i++){
+				var package = data.player[i];
+				var p = Player.list[package.id];
+				if(p){
+					if(package.x !== undefined){
+						p.x = package.x;
+					}
+					if(package.y !== undefined){
+						p.y = package.y;
+					}
+					if(package.hp !== undefined){
+						p.hp = package.hp;
+					}
+					if(package.score !== undefined){
+						p.score = package.score;
+					}
+				}
+			}
+			for(var i = 0; i < data.bullet.length; i++){
+				var package = data.bullet[i];
+				var b = Bullet.list[data.bullet[i].id];
+				if(b){
+					if(package.x !== undefined){
+						b.x = package.x;
+					}
+					if(package.y !== undefined){
+						b.y = package.y;
+					}
+				}
+			}
+		});
+
+		// remove
+
+		socket.on('remove', function(data){
+			for(var i = 0;i < data.player.length; i++){
+				delete Player.list[data.player[i]];
+			}
+			for(var i = 0;i < data.bullet.length; i++){
+				delete Bullet.list[data.bullet[i]];
+			}
+		});
+	
+	setInterval(function(){
+		ctx.clearRect(0,0,500,500);
+		for (var i in Player.list) {
+			Player.list[i].draw();
+		}
+		for (var i in Bullet.list) {
+			Bullet.list[i].draw();
+		}
+	},40);
+
+	// KeyPress Events
 
 	document.onkeydown = function(event) {
 		if(event.keyCode === 68){  // 'D' key

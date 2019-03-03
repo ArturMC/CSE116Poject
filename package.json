@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "repository": {
-  "type" : "git",
-  "url" : "https://github.com/ArturMC/CSE116Poject",
+    "type": "git",
+    "url": "https://github.com/ArturMC/CSE116Poject"
   },
   "dependencies": {
     "express": "^4.16.4",
