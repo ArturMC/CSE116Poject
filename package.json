@@ -12,9 +12,12 @@
     "mongojs": "^2.6.0",
     "socket.io": "^1.7.4"
   },
+  "engines": {
+    "node": "4.1.x"
+  },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC"
