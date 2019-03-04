@@ -80,7 +80,7 @@ Add additional notes about how to deploy this on a live system
 
 * **Artur Chojecki** - *Server* - [ArturMC](https://github.com/ArturMC)
 * **Gerard Modica** - *Front-End* - [Gerard421](https://github.com/Gerard421)
-* **Mike McDonald** - *Initial work* - [msmcdonald53025](https://github.com/msmcdonald53025)
+* **Mike McDonald** - *Map Design & Testing* - [msmcdonald53025](https://github.com/msmcdonald53025)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
