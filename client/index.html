@@ -1,11 +1,67 @@
-<div id="signDiv">
-	Username: <input id="signDiv-username" type="text"></input><br>
-	Password: <input id="signDiv-password" type="password"></input>
-	<button id="signDiv-signIn">Sign In</button>
-	<button id="signDiv-signUp">Sign Up</button>
-</div>
+<body class="login">
+<div id="signDiv" class ="textbox">
+  <h1> Login</h1>
+  Username: <input id="signDiv-username" type="text"></input><br>
+  Password: <input id="signDiv-password" type="password"></input>
+  <button id="signDiv-signIn" class="btn">Sign In</button>
+  <button id="signDiv-signUp" class="btn">Sign Up</button>
+  <style>
+     body.login{
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        background: url(/client/tank.jpg) no-repeat;
+        background-size: cover;
+        background-position: center;
+        height:100vh;
 
-<div id="gameDiv" style="display:none;">
+
+     }
+     .textbox{
+        font-size: 20px;
+        width: 185px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        color: white;
+     }
+
+     .textbox h1{
+        float: left;
+        font-size: 40px;
+        border-bottom: 6px solid #4caf50;
+        margin-bottom: 50px;
+        padding: 13px 0;
+        color: white;
+     }
+     .textbox input{
+        border: none;
+        outline: none;
+        background: white ;
+        color: black;
+        font-size: 18px;
+        width: 80%;
+        float: left;
+        margin: 0 10px;
+     }
+     .btn{
+        width: 100%;
+        background: none;
+        border: 2px solid #4caf50;
+        color: black;
+        padding: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        margin: 12px 0;
+
+     }
+
+  </style>
+</div>
+</body>
+
+<div id="gameDiv" style="display:none;" class = "lol">
 	<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
@@ -15,10 +71,19 @@
 	<form id="chat-form">
 		<input id="chat-input" type="text" style="width:500px"></input>
 	</form>
+	 <style>
+     .lol{
+        background: white;
+        background-size: cover repeat;
+	 	background-position: center;
+     }
+  </style>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+	var WIDTH = 500;
+	var HEIGHT = 500;
 	var socket = io();
 
 
@@ -78,6 +143,14 @@
 
 	// Game Related
 
+	var Img = {};
+	Img.player = new Image();
+	Img.player.src = '/client/img/adventurer_stand.png';
+	Img.bullet = new Image();
+	Img.bullet.src = '/client/img/bullet_red.png';
+	Img.map = new Image();
+	Img.map.src = '/client/img/map.png';
+
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 
@@ -94,10 +167,21 @@
 			self.score = initPackage.score;
 
 			self.draw = function() {
+				var x = self.x - Player.list[selfId].x + WIDTH/2;
+				var y = self.y - Player.list[selfId].y + HEIGHT/2;
+
 				var hpWidth = 30 * self.hp / self.hpMax;
-				ctx.fillRect(self.x - hpWidth/2, self.y - 40, hpWidth, 4);
-				ctx.fillText(self.number, self.x, self.y);
-				ctx.fillText(self.score, self.x, self.y-60);
+				ctx.fillStyle = 'red';
+				ctx.fillRect(x - hpWidth/2, y - 40, hpWidth, 4);
+				
+				var width = Img.player.width/2;
+				var height = Img.player.height/2;
+
+				ctx.drawImage(Img.player,
+				0,0,Img.player.width,Img.player.height,
+				x-width/2,y-height/2,width,height);
+
+				// ctx.fillText(self.score, self.x, self.y-60);
 			}
 
 			Player.list[self.id] = self;
@@ -113,7 +197,15 @@
 			self.y = initPackage.y;
 
 			self.draw = function() {
-				ctx.fillRect(self.x-5, self.y-5,10,10);
+				var width = Img.bullet.width/2;
+				var height = Img.bullet.height/2;
+
+				var x = self.x - Player.list[selfId].x + WIDTH/2;
+				var y = self.y - Player.list[selfId].y + HEIGHT/2;
+
+				ctx.drawImage(Img.bullet,
+				0,0,Img.bullet.width,Img.bullet.height,
+				x-width/2,y-height/2,width,height);
 			}
 
 			Bullet.list[self.id] = self;
@@ -121,7 +213,12 @@
 		}
 		Bullet.list = {};
 
+		var selfId = null;
+
 		socket.on('init',function(data){
+			if(data.selfId){
+				selfId = data.selfId;
+			}
 			for(var i = 0; i < data.player.length;i++){
 				new Player(data.player[i]);
 			}
@@ -177,7 +274,12 @@
 		});
 	
 	setInterval(function(){
+		if(!selfId){
+			return;
+		}
 		ctx.clearRect(0,0,500,500);
+		drawMap();
+		drawScore();
 		for (var i in Player.list) {
 			Player.list[i].draw();
 		}
@@ -185,6 +287,17 @@
 			Bullet.list[i].draw();
 		}
 	},40);
+
+	var drawMap = function() {
+		var x = WIDTH/2 - Player.list[selfId].x;
+		var y = HEIGHT/2 - Player.list[selfId].y;
+		ctx.drawImage(Img.map,x,y);
+	}
+
+	var drawScore = function() {
+		ctx.fillStyle = 'white';
+		ctx.fillText(Player.list[selfId].score,0,30);
+	}
 
 	// KeyPress Events
 
