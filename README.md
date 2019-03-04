@@ -70,7 +70,7 @@ Add additional notes about how to deploy this on a live system
 * [Heroku](https://www.heroku.com/) - Hosting
 * [Express](http://expressjs.com/) - Routing and Sending Files
 * [Socket.io](https://socket.io/) - Socket Communication
-* [Tiled](https://www.mapeditor.org/) - Used to generate RSS Feeds
+* [Tiled](https://www.mapeditor.org/) - Map Editor
 * [MongoDB](https://www.mongodb.com/) - Database
 * [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Database Hosting
 * [Nodejs](https://nodejs.org/en/) - Server
