@@ -67,14 +67,19 @@ Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Heroku](http://www.dropwizard.io/1.0.2/docs/) - Hosting
+* [Express](https://maven.apache.org/) - Dependency Management
+* [Websocket](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Tiled](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [MongoDB](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Nodejs](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Tiled](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+Nodejs
 
 ## Authors
 
-* **Artur Chojecki** - *Server* - [ArturMC](https://github.com/PurpleBooth)
-* **Artur Chojecki** - *Front-End* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Artur Chojecki** - *Server* - [ArturMC](https://github.com/ArturMC)
+* **Artur Chojecki** - *Front-End* - [Gerard421](https://github.com/Gerard421)
 * **Artur Chojecki** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
