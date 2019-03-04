@@ -1,6 +1,6 @@
 # CSE116Project
 
-This is a multiplayer game that was worked on as a 3 man project through the Spring 2019 semester. Players are able to 
+This game was created by 3 CSE116 students at the University at Buffalo as part of a semester long project. Currently, it is hosted on a dedicated heroku website with a MongoDB database storing the created user accounts. 
 
 ## Getting Started
 
@@ -67,20 +67,20 @@ Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Heroku](http://www.dropwizard.io/1.0.2/docs/) - Hosting
-* [Express](https://maven.apache.org/) - Dependency Management
-* [Websocket](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-* [Tiled](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-* [MongoDB](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-* [Nodejs](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-* [Tiled](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-Nodejs
+* [Heroku](https://www.heroku.com/) - Hosting
+* [Express](http://expressjs.com/) - Routing and Sending Files
+* [Socket.io](https://socket.io/) - Socket Communication
+* [Tiled](https://www.mapeditor.org/) - Used to generate RSS Feeds
+* [MongoDB](https://www.mongodb.com/) - Database
+* [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Database Hosting
+* [Nodejs](https://nodejs.org/en/) - Server
+
 
 ## Authors
 
 * **Artur Chojecki** - *Server* - [ArturMC](https://github.com/ArturMC)
-* **Artur Chojecki** - *Front-End* - [Gerard421](https://github.com/Gerard421)
-* **Artur Chojecki** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Gerard Modica** - *Front-End* - [Gerard421](https://github.com/Gerard421)
+* **Mike McDonald** - *Initial work* - [msmcdonald53025](https://github.com/msmcdonald53025)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
