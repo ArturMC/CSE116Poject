@@ -1,8 +1,8 @@
 <body class="login">
 <div id="signDiv" class ="textbox">
   <h1> Login</h1>
-  Username: <input id="signDiv-username" type="text"></input><br>
-  Password: <input id="signDiv-password" type="password"></input>
+  Username: <input id="signDiv-username" placeholder="username" type="text"></input><br>
+  Password: <input id="signDiv-password" placeholder="password" type="password"></input>
   <button id="signDiv-signIn" class="btn">Sign In</button>
   <button id="signDiv-signUp" class="btn">Sign Up</button>
   <style>
@@ -10,8 +10,8 @@
         margin: 0;
         padding: 0;
         font-family: sans-serif;
-        background: url(/client/tank.jpg) no-repeat;
-        background-size: cover;
+        background: url(/client/tank.jpg);
+        background-size: contain;
         background-position: center;
         height:100vh;
 
@@ -64,12 +64,13 @@
 <div id="gameDiv" style="display:none;" class = "lol">
 	<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
-	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-		<div>Hello!</div>
+	<div id="chat-text" style="float:right;width:500px;height:100px;overflow-y:scroll">
+		<div><b>Gameplay:</b> Use WASD to move around, and mouse click to shoot. Kill other players to update your score in the upper left corner!</div>
+		<div style="text-decoration: underline;">Game Chat Below</div>
 	</div>
 
 	<form id="chat-form">
-		<input id="chat-input" type="text" style="width:500px"></input>
+		<input id="chat-input" type="text" placeholder="message" style="float:right;width:500px"></input>
 	</form>
 	 <style>
      .lol{
@@ -149,7 +150,7 @@
 	Img.bullet = new Image();
 	Img.bullet.src = '/client/img/bullet_red.png';
 	Img.map = new Image();
-	Img.map.src = '/client/img/map.png';
+	Img.map.src = '/client/img/map.v1.png';
 
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
@@ -295,7 +296,7 @@
 	}
 
 	var drawScore = function() {
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = 'black';
 		ctx.fillText(Player.list[selfId].score,0,30);
 	}
 

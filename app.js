@@ -2,7 +2,7 @@
 
 var mongojs = require("mongojs");
 var uri = "mongodb://Artur:%40Amber120@cse116game-shard-00-00-9ogxf.mongodb.net:27017,cse116game-shard-00-01-9ogxf.mongodb.net:27017,cse116game-shard-00-02-9ogxf.mongodb.net:27017/myGame?ssl=true&replicaSet=CSE116Game-shard-0&authSource=admin&retryWrites=true";
-var db = mongojs(uri, ['account', 'progress']);
+var db = mongojs(uri, ['users', 'progress']);
 
 // Initialize Express for Files
 var express = require('express');
@@ -124,6 +124,7 @@ Player.list = {};
 
 Player.onConnect  = function(socket){
 	var player = Player(socket.id);
+	console.log('Socket Connected.');
 	socket.on('keyPress', function(data){
 		if(data.inputId === 'right'){
 			player.pressingRight = data.state;
@@ -156,6 +157,7 @@ Player.getAllInitPack = function() {
 }
 
 Player.onDisconnect = function(socket) {
+	console.log('Socket Disonnected.');
 	delete Player.list[socket.id];
 	removePackage.player.push(socket.id);
 
@@ -253,7 +255,7 @@ Bullet.getAllInitPack = function() {
 var DEBUG = true;
 
 var isValidPassword = function(data, cb) {
-	db.account.find({username:data.username,password:data.password}, function(err, res){
+	db.users.find({username:data.username,password:data.password}, function(err, res){
 		if(res.length > 0){
 			cb(true);
 		} else {
@@ -263,7 +265,7 @@ var isValidPassword = function(data, cb) {
 }
 
 var isUsernameTaken = function(data, cb) {
-	db.account.find({username:data.username}, function(err, res){
+	db.users.find({username:data.username}, function(err, res){
 		if(res.length > 0){
 			cb(true);
 		} else {
@@ -273,7 +275,7 @@ var isUsernameTaken = function(data, cb) {
 }
 
 var addUser = function(data, cb) {
-	db.account.insert({username:data.username,password:data.password}, function(err){
+	db.users.insert({username:data.username,password:data.password}, function(err){
 		cb();
 	});
 }
