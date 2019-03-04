@@ -125,7 +125,7 @@ Player.list = {};
 Player.onConnect  = function(socket){
 	var player = Player(socket.id);
 	console.log('Socket Connected.');
-	socket.on('keyPress', function(data){
+	socket.on('keyStroke', function(data){
 		if(data.inputId === 'right'){
 			player.pressingRight = data.state;
 		} else if (data.inputId === 'down') {
